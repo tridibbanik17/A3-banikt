@@ -56,7 +56,42 @@ public class Main {
 
             logger.info("Maze read successfully with {} rows.", lines.size());
 
+            int maxLength = lines.stream().mapToInt(String::length).max().orElse(0);
+            Character[][] mazeArray = new Character[lines.size()][maxLength];
 
+            for (int i = 0; i < lines.size(); i++) {
+                String row = lines.get(i);
+                for (int j = 0; j < maxLength; j++) {
+                    mazeArray[i][j] = j < row.length() ? row.charAt(j) : ' ';
+                }
+            }
+
+            Maze maze = new Maze(mazeArray);
+            logger.info("Maze object created successfully. Entry: ({}, {}), Exit: ({}, {})",
+                    maze.getEntryRow(), maze.getEntryCol(), maze.getExitRow(), maze.getExitCol());
+
+            logger.info("The maze looks like: {}", maze.printMaze());
+
+            MazeSolver solver = new MazeSolver(maze);
+            logger.info("MazeSolver initialized. Starting solution process...");
+
+            try {
+                if (solver.solve()) {
+                    String canonicalPath = solver.getFinalOutput();
+                    logger.info("Maze solved successfully! Canonical path: {}", canonicalPath);
+
+                    // Encode the canonical path
+                    String factorizedPath = Encoder.encoder(canonicalPath);
+                    logger.info("Factorized path: {}", factorizedPath);
+
+                    logger.info("Detailed path steps:");
+                    solver.getPathTaken().forEach(logger::info);
+                } else {
+                    logger.error("Maze could not be solved. No valid path to the exit.");
+                }
+            } catch (Exception e) {
+                logger.error("An error occurred while solving the maze: {}", e.getMessage(), e);
+            }
 
         } catch (Exception e) {
             logger.error("An error occurred while processing the maze file: {}", e.getMessage(), e);
