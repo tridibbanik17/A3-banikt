@@ -27,6 +27,7 @@ public class Maze {
         throw new IllegalStateException("No entry point found at column 0");
     }
 
+    // Getter method to get the entry column
     public int getEntryCol() {
         return this.entryCol;
     }
@@ -43,10 +44,12 @@ public class Maze {
         throw new IllegalStateException("No exit point found at the rightmost column.");
     }
 
+    // Getter method to get the exit column
     public int getExitCol() {
         return this.exitCol;
     }
 
+    // Getter method to get the 2D grid
     public Character[][] getGrid() {
         return this.grid;
     }
