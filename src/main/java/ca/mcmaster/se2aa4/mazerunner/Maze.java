@@ -53,7 +53,7 @@ public class Maze {
 
     // Check if a given position is the exit
     public boolean isExit(int row, int col) {
-        return row == getExitCol() && col == getExitCol();
+        return row == getExitRow() && col == getExitCol();
     }
 
     // Check if a move to a given position is valid
@@ -63,13 +63,15 @@ public class Maze {
         return row >= 0 && row < grid.length && col >= 0 && col < grid[0].length && grid[row][col] == ' ';
     }
 
-    // Method to print the maze (for visualization)
-    public void printMaze() {
+    StringBuilder mazeLook = new StringBuilder("\n");
+    // Method to print the maze (for visualization and verification)
+    public String printMaze() {
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
-                System.out.print(grid[i][j] + " ");
+                mazeLook.append(grid[i][j] + " ");
             }
-            System.out.println();
+            mazeLook.append("\n");
         }
+        return mazeLook.toString();
     }
 }
