@@ -1,4 +1,3 @@
-// import java.util.Scanner;
 package ca.mcmaster.se2aa4.mazerunner;
 
 public class Encoder {
@@ -19,12 +18,4 @@ public class Encoder {
         }
         return encodedText.toString();
     }
-
-
-    // public static void main(String[] args) {
-    //     Scanner scanner = new Scanner(System.in);
-    //     System.out.println("Enter");
-    //     String str = scanner.nextLine();
-    //     System.out.println("Encoded string is " + encoder(str));
-    // }
 }
