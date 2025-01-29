@@ -59,12 +59,10 @@ public class Maze {
         return row == getExitRow() && col == getExitCol();
     }
 
-    // Check if a move to a given position is valid
-    // row and col need to be between 0 and (grid's length - 1)
-    // Plus, the position must be an empty space and not a wall
-    public boolean isValidMove(int row, int col) {
-        return row >= 0 && row < grid.length && col >= 0 && col < grid[0].length && grid[row][col] == ' ';
+    public char returnCellValue(int row, int col) {
+        return grid[row][col];
     }
+
 
     StringBuilder mazeLook = new StringBuilder("\n");
     // Method to print the maze (for visualization and verification)
