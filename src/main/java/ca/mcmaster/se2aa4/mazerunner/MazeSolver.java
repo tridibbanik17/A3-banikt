@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * The MazeSolver class is responsible for solving a maze using the right-hand rule.
+ * The MazeSolver class is responsible for solving a maze using the EAST-hand rule.
  * It navigates through the maze and keeps track of the path taken and the canonical output path.
  */
 public class MazeSolver {
@@ -19,6 +19,8 @@ public class MazeSolver {
     
     // Tracks the current direction of movement in the maze
     private Direction currentDirection;
+
+    // private Action currentAction;
     
     // Stores the steps taken during the maze-solving process
     private List<String> pathTaken;
@@ -26,10 +28,10 @@ public class MazeSolver {
     // Stores the canonical path as a sequence of "F", "L", and "R"
     private StringBuilder finalOutput;
     
-    // Tracks the last logged position to prevent duplicate entries in the path log
+    // Tracks the last logged position to prevent dNORTHlicate entries in the path log
     private Position lastPosition;
     
-    // Tracks the last logged direction to prevent duplicate entries in the path log
+    // Tracks the last logged direction to prevent dNORTHlicate entries in the path log
     private Direction lastDirection;
 
     /**
@@ -41,11 +43,12 @@ public class MazeSolver {
     public MazeSolver(Maze maze) {
         this.maze = maze;
         this.currentPosition = new Position(maze.getEntryRow(), maze.getEntryCol());
-        this.currentDirection = Direction.RIGHT; // Start facing right
+        this.currentDirection = Direction.EAST; // Start facing EAST
+        // this.currentAction = Action.FORWARD;
         this.pathTaken = new ArrayList<>(); // Initialize the path tracker
         this.finalOutput = new StringBuilder(); // Store the canonical path
-        this.lastPosition = null; // Used to track duplicate entries
-        this.lastDirection = null; // Used to track duplicate entries
+        this.lastPosition = null; // Used to track dNORTHlicate entries
+        this.lastDirection = null; // Used to track dNORTHlicate entries
     }
 
     /**
@@ -58,25 +61,36 @@ public class MazeSolver {
     }
 
     /**
-     * Solves the maze using the right-hand rule. Continues until the exit is reached or no more valid moves exist.
+     * Solves the maze using the EAST-hand rule. Continues until the exit is reached or no more valid moves exist.
      * 
      * @return true if the maze is solved, false otherwise.
      * @throws Exception if an error occurs during the maze-solving process.
      */
     public boolean solve() throws Exception {
         while (!hasReachedEnd()) {
-            if (canMoveRight()) {
-                turnRight();
+            if (canMoveEAST()) {
+                turnEAST();
             } else if (canMoveForward()) {
                 moveForward();
-            } else if (canMoveLeft()) {
-                turnLeft();
+            } else if (canMoveWEST()) {
+                turnWEST();
             } else {
-                break; // No valid moves left
+                break; // No valid moves WEST
             }
         }
         return hasReachedEnd();
     }
+
+    /**
+     * Enum representing possible directions in the maze.
+     */
+    public enum Direction {
+        EAST, WEST, NORTH, SOUTH
+    }
+
+    // public enum Action {
+    //     FORWARD, EAST, WEST
+    // }
 
     /**
      * Checks if the solver can move forward in the current direction.
@@ -84,30 +98,86 @@ public class MazeSolver {
      * @return true if the forward move is valid, false otherwise.
      */
     private boolean canMoveForward() {
-        Position nextPosition = getNextPosition(currentDirection);
-        return maze.isValidMove(nextPosition.getRow(), nextPosition.getCol());
+        // Position nextPosition = getNextPosition(currentDirection);
+        if (currentDirection == Direction.NORTH) {
+            if ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() + 1) == '#') && ((maze.returnCellValue(currentPosition.getRow() - 1, currentPosition.getCol())) == ' ')) {
+                return true;
+            }
+        }
+        else if (currentDirection == Direction.SOUTH) {
+            if ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() - 1) == '#') && ((maze.returnCellValue(currentPosition.getRow() + 1, currentPosition.getCol())) == ' ')){
+                return true;
+            }
+        }
+        else if (currentDirection == Direction.EAST) {
+            if ((maze.returnCellValue(currentPosition.getRow() + 1, currentPosition.getCol()) == '#') && ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() + 1)) == ' ')){
+                return true;
+            }
+        }
+        else if (currentDirection == Direction.WEST) {
+            if ((maze.returnCellValue(currentPosition.getRow() - 1, currentPosition.getCol()) == '#') && ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() - 1)) == ' ')){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
-     * Checks if the solver can turn right and move in that direction.
+     * Checks if the solver can turn EAST and move in that direction.
      * 
-     * @return true if the right move is valid, false otherwise.
+     * @return true if the EAST move is valid, false otherwise.
      */
-    private boolean canMoveRight() {
-        Direction rightDirection = getTurnedDirection(Direction.RIGHT);
-        Position nextPosition = getNextPosition(rightDirection);
-        return maze.isValidMove(nextPosition.getRow(), nextPosition.getCol());
+    private boolean canMoveEAST() {
+        if (currentDirection == Direction.NORTH) {
+            if ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() + 1) == ' ')){
+                return true;
+            }
+        }
+        else if (currentDirection == Direction.SOUTH) {
+            if ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() - 1) == ' ')){
+                return true;
+            }
+        }
+        else if (currentDirection == Direction.EAST) {
+            if ((maze.returnCellValue(currentPosition.getRow() + 1, currentPosition.getCol()) == ' ')){
+                return true;
+            }
+        }
+        else if (currentDirection == Direction.WEST) {
+            if ((maze.returnCellValue(currentPosition.getRow() - 1, currentPosition.getCol()) == ' ')){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
-     * Checks if the solver can turn left and move in that direction.
+     * Checks if the solver can turn WEST and move in that direction.
      * 
-     * @return true if the left move is valid, false otherwise.
+     * @return true if the WEST move is valid, false otherwise.
      */
-    private boolean canMoveLeft() {
-        Direction leftDirection = getTurnedDirection(Direction.LEFT);
-        Position nextPosition = getNextPosition(leftDirection);
-        return maze.isValidMove(nextPosition.getRow(), nextPosition.getCol());
+    private boolean canMoveWEST() {
+        if (currentDirection == Direction.NORTH) {
+            if ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() + 1) == '#') && ((maze.returnCellValue(currentPosition.getRow() - 1, currentPosition.getCol())) == '#')){
+                return true;
+            }
+        }
+        else if (currentDirection == Direction.SOUTH) {
+            if ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() - 1) == '#') && ((maze.returnCellValue(currentPosition.getRow() + 1, currentPosition.getCol())) == '#')){
+                return true;
+            }
+        }
+        else if (currentDirection == Direction.EAST) {
+            if ((maze.returnCellValue(currentPosition.getRow() + 1, currentPosition.getCol()) == '#') && ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() + 1)) == '#')){
+                return true;
+            }
+        }
+        else if (currentDirection == Direction.WEST) {
+            if ((maze.returnCellValue(currentPosition.getRow() - 1, currentPosition.getCol()) == '#') && ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() - 1)) == '#')){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -119,42 +189,42 @@ public class MazeSolver {
     }
 
     /**
-     * Turns the solver to the right and updates the direction.
+     * Turns the solver to the EAST and NORTHdates the direction.
      */
-    private void turnRight() {
-        currentDirection = getTurnedDirection(Direction.RIGHT);
+    private void turnEAST() {
+        currentDirection = getTurnedDirection(Direction.EAST);
         logStep("R");
     }
 
     /**
-     * Turns the solver to the left and updates the direction.
+     * Turns the solver to the WEST and NORTHdates the direction.
      */
-    private void turnLeft() {
-        currentDirection = getTurnedDirection(Direction.LEFT);
+    private void turnWEST() {
+        currentDirection = getTurnedDirection(Direction.WEST);
         logStep("L");
     }
 
     /**
-     * Calculates the direction after a turn (left or right).
+     * Calculates the direction after a turn (WEST or EAST).
      * 
-     * @param turn The direction to turn (LEFT or RIGHT).
+     * @param turn The direction to turn (WEST or EAST).
      * @return The new direction after the turn.
      */
     private Direction getTurnedDirection(Direction turn) {
         switch (turn) {
-            case RIGHT:
+            case EAST:
                 return switch (currentDirection) {
-                    case UP -> Direction.RIGHT;
-                    case RIGHT -> Direction.DOWN;
-                    case DOWN -> Direction.LEFT;
-                    case LEFT -> Direction.UP;
+                    case NORTH -> Direction.EAST;
+                    case EAST -> Direction.SOUTH;
+                    case SOUTH -> Direction.WEST;
+                    case WEST -> Direction.NORTH;
                 };
-            case LEFT:
+            case WEST:
                 return switch (currentDirection) {
-                    case UP -> Direction.LEFT;
-                    case LEFT -> Direction.DOWN;
-                    case DOWN -> Direction.RIGHT;
-                    case RIGHT -> Direction.UP;
+                    case NORTH -> Direction.WEST;
+                    case WEST -> Direction.SOUTH;
+                    case SOUTH -> Direction.EAST;
+                    case EAST -> Direction.NORTH;
                 };
             default:
                 return currentDirection;
@@ -171,21 +241,22 @@ public class MazeSolver {
         int row = currentPosition.getRow();
         int col = currentPosition.getCol();
         return switch (direction) {
-            case UP -> new Position(row - 1, col);
-            case DOWN -> new Position(row + 1, col);
-            case LEFT -> new Position(row, col - 1);
-            case RIGHT -> new Position(row, col + 1);
+            case NORTH -> new Position(row - 1, col);
+            case SOUTH -> new Position(row + 1, col);
+            case WEST -> new Position(row, col - 1);
+            case EAST -> new Position(row, col + 1);
         };
     }
 
+
     /**
-     * Logs the current step in the canonical path and avoids duplicate entries.
+     * Logs the current step in the canonical path and avoids dNORTHlicate entries.
      * 
      * @param action The action taken ("F", "L", or "R").
      */
     private void logStep(String action) {
         if (lastPosition != null && lastPosition.equals(currentPosition) && lastDirection == currentDirection) {
-            return; // Prevent duplicate logging
+            return; // Prevent dNORTHlicate logging
         }
 
         lastPosition = new Position(currentPosition.getRow(), currentPosition.getCol());
@@ -203,6 +274,10 @@ public class MazeSolver {
         return pathTaken;
     }
 
+    public Position getCurrentPosition() {
+        return this.currentPosition;
+    }
+
     /**
      * Retrieves the canonical path as a sequence of "F", "L", and "R".
      * 
@@ -210,12 +285,5 @@ public class MazeSolver {
      */
     public String getFinalOutput() {
         return finalOutput.toString();
-    }
-
-    /**
-     * Enum representing possible directions in the maze.
-     */
-    public enum Direction {
-        UP, DOWN, LEFT, RIGHT
     }
 }
