@@ -77,7 +77,7 @@ public class Main {
             }
             reader.close();
 
-            logger.info("Maze read successfully with {} rows.", lines.size());
+            logger.info("Maze read successfully with {} rows and {} columns.", lines.size(), lines.get(0).length());
 
             // Determine the maximum row length to create a 2D maze array.
             int maxLength = lines.stream().mapToInt(String::length).max().orElse(0);
@@ -106,19 +106,23 @@ public class Main {
             try {
                 // Solve the maze and handle the solution output.
                 if (solver.solve()) {
+                    // Log the detailed steps taken to solve the maze.
+                    logger.info("Detailed path steps:\n");
+                    solver.getPathTaken().forEach(logger::info);
+
+                    logger.info("\n\nMaze was succussfully solved by entering through ({}, {}) and exiting through ({}, {}).\n",
+                    maze.getEntryRow(), maze.getEntryCol(), maze.getExitRow(), maze.getExitCol());
+
+                    // Log the complete canonical path.
                     String canonicalPath = solver.getFinalOutput();
-                    logger.info("Maze solved successfully! Canonical path: {}", canonicalPath);
+                    logger.info("\n\nMaze solved successfully! Canonical path: \n{}", canonicalPath);
 
                     // Encode the canonical path using the Encoder utility.
                     String factorizedPath = Encoder.encoder(canonicalPath);
-                    logger.info("Factorized path: {}", factorizedPath);
-
-                    // Log the detailed steps taken to solve the maze.
-                    logger.info("Detailed path steps:");
-                    solver.getPathTaken().forEach(logger::info);
+                    logger.info("\n\nFactorized path: \n{}\n", factorizedPath);
                 } else {
-                    logger.info("Current position is: {}", solver.getCurrentPosition());
-                    logger.error("Maze could not be solved. No valid path to the exit.");
+                    logger.info("\nCurrent position is: {}", solver.getCurrentPosition());
+                    logger.error("\nMaze could not be solved. No valid path to the exit.");
                 }
             } catch (Exception e) {
                 logger.error("An error occurred while solving the maze: {}", e.getMessage(), e);
