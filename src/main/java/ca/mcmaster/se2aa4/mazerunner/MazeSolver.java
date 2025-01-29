@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import ca.mcmaster.se2aa4.mazerunner.MazeSolver.Direction;
+
 /**
  * The MazeSolver class is responsible for solving a maze using the EAST-hand rule.
  * It navigates through the maze and keeps track of the path taken and the canonical output path.
@@ -46,7 +48,7 @@ public class MazeSolver {
         this.currentDirection = Direction.EAST; // Start facing EAST
         // this.currentAction = Action.FORWARD;
         this.pathTaken = new ArrayList<>(); // Initialize the path tracker
-        this.finalOutput = new StringBuilder(); // Store the canonical path
+        this.finalOutput = new StringBuilder(""); // Store the canonical path
         this.lastPosition = null; // Used to track dNORTHlicate entries
         this.lastDirection = null; // Used to track dNORTHlicate entries
     }
@@ -70,14 +72,17 @@ public class MazeSolver {
         while (!hasReachedEnd()) {
             if (canMoveForward()) {
                 moveForward();
-            } else if (canMoveEAST()) {
+            } else if (canTurnAround()) {
+                turnAround(); 
+                moveForward();
+            } else if (canTurnEAST()) {
                 turnEAST();
                 moveForward();
-            } else if (canMoveWEST()) {
+            } else if (canTurnWEST()) {
                 turnWEST();
                 moveForward();
             } else {
-                break; // No valid moves WEST
+                break;
             }
         }
         return hasReachedEnd();
@@ -129,7 +134,7 @@ public class MazeSolver {
      * 
      * @return true if the EAST move is valid, false otherwise.
      */
-    private boolean canMoveEAST() {
+    private boolean canTurnEAST() {
         if (!canMoveForward()) {
             if (currentDirection == Direction.NORTH) {
                 if ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() + 1) == ' ')){
@@ -160,7 +165,7 @@ public class MazeSolver {
      * 
      * @return true if the WEST move is valid, false otherwise.
      */
-    private boolean canMoveWEST() {
+    private boolean canTurnWEST() {
         if (currentDirection == Direction.NORTH) {
             if ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() + 1) == '#') && ((maze.returnCellValue(currentPosition.getRow() - 1, currentPosition.getCol())) == '#')){
                 return true;
@@ -183,6 +188,39 @@ public class MazeSolver {
         }
         return false;
     }
+
+    private boolean canTurnAround() {
+        if (currentDirection == Direction.NORTH) {
+            if ((maze.returnCellValue(currentPosition.getRow() - 1, currentPosition.getCol()) == '#') && (maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() - 1) == '#') && (maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() + 1) == '#')) {
+                return true;
+            }
+        } else if (currentDirection == Direction.SOUTH) {
+            if ((maze.returnCellValue(currentPosition.getRow() + 1, currentPosition.getCol()) == '#') && (maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() - 1) == '#') && (maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() + 1) == '#')) {
+                return true;
+            }
+        } else if (currentDirection == Direction.EAST) {
+            if ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() + 1) == '#') && (maze.returnCellValue(currentPosition.getRow() - 1, currentPosition.getCol()) == '#') && (maze.returnCellValue(currentPosition.getRow() + 1, currentPosition.getCol()) == '#')) {
+                return true;
+            }
+        } else if (currentDirection == Direction.WEST) {
+            if ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() - 1) == '#') && (maze.returnCellValue(currentPosition.getRow() - 1, currentPosition.getCol()) == '#') && (maze.returnCellValue(currentPosition.getRow() + 1, currentPosition.getCol()) == '#')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void turnAround() {
+        currentDirection = switch (currentDirection) {
+            case NORTH -> Direction.SOUTH;
+            case SOUTH -> Direction.NORTH;
+            case EAST -> Direction.WEST;
+            case WEST -> Direction.EAST;
+        };
+        logStep("R"); // Turning right twice to simulate a 180-degree turn
+        logStep("R");
+    }
+
 
     /**
      * Moves the solver forward in the current direction.
@@ -289,6 +327,19 @@ public class MazeSolver {
      * @return The canonical path string.
      */
     public String getFinalOutput() {
-        return finalOutput.toString();
+        String finalOutputString = finalOutput.toString();
+        StringBuilder cleanedBuild = new StringBuilder("");
+        for (int letter = 1; letter < finalOutputString.length(); letter++) {
+            if (finalOutputString.charAt(letter - 1) != finalOutputString.charAt(letter)) {
+                cleanedBuild.append(finalOutputString.charAt(letter - 1) + " ");
+            } else {
+                cleanedBuild.append(finalOutputString.charAt(letter - 1));
+            }
+
+            if (letter == finalOutputString.length() - 1) {
+                cleanedBuild.append(finalOutputString.charAt(letter));
+            } 
+        }
+        return cleanedBuild.toString();
     }
 }
