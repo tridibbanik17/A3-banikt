@@ -31,7 +31,7 @@ public class Encoder {
 
         // Iterate through the string to encode consecutive characters
         for (int i = 0; i < longText.length(); i++) {
-            int count = 1; // Initialize count for current character
+            Integer count = 1; // Initialize count for current character
 
             // Count consecutive occurrences of the same character
             while ((i < longText.length() - 1) && (longText.charAt(i) == longText.charAt(i + 1))) {
@@ -39,8 +39,13 @@ public class Encoder {
                 i++;
             }
 
+            String countStr = count.toString();
+            if (countStr.equals("1")) {
+                countStr = "";
+            }
+
             // Append the count and the character (in uppercase) to the encoded string
-            encodedText.append(count + String.valueOf(longText.charAt(i)).toUpperCase() + " ");
+            encodedText.append(countStr + String.valueOf(longText.charAt(i)).toUpperCase() + " ");
         }
 
         // Return the factorized path
