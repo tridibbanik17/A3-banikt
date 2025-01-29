@@ -130,9 +130,9 @@ public class Main {
                         String cmdPathValidArg = cmd.getOptionValue("p");
                         String cleanedPath = factorizedPath.trim();
                         if (cleanedPath.equals(cmdPathValidArg)) {
-                            logger.info("\n\nValidation successful: The factorized path matches the expected path.\n");
+                            logger.info("\n\nValidation successful: The generated factorized path matches the path entered as the command line arg after -p flag.\n");
                         } else {
-                            logger.error("\n\nValidation failed: path entered in the cmd arg '{}',\n but generated path '{}'.\n", cmdPathValidArg, cleanedPath);
+                            logger.error("\n\nValidation failed: path entered as the command line argument '{}',\n but generated path '{}'.\n", cmdPathValidArg, cleanedPath);
                         }
                     }
                 } else {
