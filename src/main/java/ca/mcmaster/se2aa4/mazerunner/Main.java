@@ -117,6 +117,7 @@ public class Main {
                     logger.info("Detailed path steps:");
                     solver.getPathTaken().forEach(logger::info);
                 } else {
+                    logger.info("Current position is: {}", solver.getCurrentPosition());
                     logger.error("Maze could not be solved. No valid path to the exit.");
                 }
             } catch (Exception e) {
