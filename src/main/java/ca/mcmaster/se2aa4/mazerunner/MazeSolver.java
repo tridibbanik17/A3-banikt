@@ -68,12 +68,14 @@ public class MazeSolver {
      */
     public boolean solve() throws Exception {
         while (!hasReachedEnd()) {
-            if (canMoveEAST()) {
+            if (canMoveForward()) {
+                moveForward();
+            } else if (canMoveEAST()) {
                 turnEAST();
-            } else if (canMoveForward()) {
                 moveForward();
             } else if (canMoveWEST()) {
                 turnWEST();
+                moveForward();
             } else {
                 break; // No valid moves WEST
             }
@@ -128,24 +130,26 @@ public class MazeSolver {
      * @return true if the EAST move is valid, false otherwise.
      */
     private boolean canMoveEAST() {
-        if (currentDirection == Direction.NORTH) {
-            if ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() + 1) == ' ')){
-                return true;
+        if (!canMoveForward()) {
+            if (currentDirection == Direction.NORTH) {
+                if ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() + 1) == ' ')){
+                    return true;
+                }
             }
-        }
-        else if (currentDirection == Direction.SOUTH) {
-            if ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() - 1) == ' ')){
-                return true;
+            else if (currentDirection == Direction.SOUTH) {
+                if ((maze.returnCellValue(currentPosition.getRow(), currentPosition.getCol() - 1) == ' ')){
+                    return true;
+                }
             }
-        }
-        else if (currentDirection == Direction.EAST) {
-            if ((maze.returnCellValue(currentPosition.getRow() + 1, currentPosition.getCol()) == ' ')){
-                return true;
+            else if (currentDirection == Direction.EAST) {
+                if ((maze.returnCellValue(currentPosition.getRow() + 1, currentPosition.getCol()) == ' ')){
+                    return true;
+                }
             }
-        }
-        else if (currentDirection == Direction.WEST) {
-            if ((maze.returnCellValue(currentPosition.getRow() - 1, currentPosition.getCol()) == ' ')){
-                return true;
+            else if (currentDirection == Direction.WEST) {
+                if ((maze.returnCellValue(currentPosition.getRow() - 1, currentPosition.getCol()) == ' ')){
+                    return true;
+                }
             }
         }
         return false;
@@ -261,6 +265,7 @@ public class MazeSolver {
 
         lastPosition = new Position(currentPosition.getRow(), currentPosition.getCol());
         lastDirection = currentDirection;
+        logger.info("Position: (" + currentPosition.getRow() + ", " + currentPosition.getCol() + "), Direction: " + action);
         pathTaken.add("Position: (" + currentPosition.getRow() + ", " + currentPosition.getCol() + "), Direction: " + action);
         finalOutput.append(action);
     }
