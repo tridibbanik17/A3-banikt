@@ -49,6 +49,7 @@ public class Main {
         // Define options for the command-line interface.
         Options options = new Options();
         options.addOption("i", "input", true, "Path to the maze input file");
+        options.addOption("p", "path", true, "Factorized path");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd;
@@ -61,6 +62,11 @@ public class Main {
             if (!cmd.hasOption("i")) {
                 logger.error("Missing required -i flag for the input file. Usage: -i <maze_file_path>");
                 return;
+            }
+
+            // Showing usage of -p flag
+            if (cmd.hasOption("i") && (!cmd.hasOption("p"))) {
+                logger.error("Wrong use of -p flag. You can validate the generated solution path using -p flag.\nUsage: -i <maze_file_path> -p <factorized_form_of_the_path>");
             }
 
             // Retrieve the path to the maze input file.
@@ -115,11 +121,20 @@ public class Main {
 
                     // Log the complete canonical path.
                     String canonicalPath = solver.getFinalOutput();
-                    logger.info("\n\nMaze solved successfully! Canonical path: \n{}", canonicalPath);
+                    logger.info("\n\nMaze solved successfully! Canonical path: \n{}\n", canonicalPath);
 
                     // Encode the canonical path using the Encoder utility.
                     String factorizedPath = Encoder.encoder(canonicalPath);
                     logger.info("\n\nFactorized path: \n{}\n", factorizedPath);
+                    if (cmd.hasOption("p")) {
+                        String cmdPathValidArg = cmd.getOptionValue("p");
+                        String cleanedPath = factorizedPath.trim();
+                        if (cleanedPath.equals(cmdPathValidArg)) {
+                            logger.info("\n\nValidation successful: The factorized path matches the expected path.\n");
+                        } else {
+                            logger.error("\n\nValidation failed: path entered in the cmd arg '{}',\n but generated path '{}'.\n", cmdPathValidArg, cleanedPath);
+                        }
+                    }
                 } else {
                     logger.info("\nCurrent position is: {}", solver.getCurrentPosition());
                     logger.error("\nMaze could not be solved. No valid path to the exit.");
