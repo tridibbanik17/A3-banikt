@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 public class PathValidator {
     private static final Logger logger = LogManager.getLogger();
 
+    // Compares the generated path with the expected path
     public static void validatePath(String generatedPath, String providedPath) {
         if (generatedPath.equals(providedPath)) {
             System.out.println("correct path");
