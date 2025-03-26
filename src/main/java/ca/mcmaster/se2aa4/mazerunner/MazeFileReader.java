@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 public class MazeFileReader {
     private static final Logger logger = LogManager.getLogger();
 
+    // Reads a maze from a file and returns it as a 2D character array
     public static Character[][] readMaze(String filePath) throws Exception {
         logger.info("Reading the maze from file: {}", filePath);
 
@@ -19,7 +20,7 @@ public class MazeFileReader {
             lines = new ArrayList<>();
             String line;
             while ((line = reader.readLine()) != null) {
-                lines.add(line);
+                lines.add(line); // Store each line of the maze
             }
         }
 
@@ -30,10 +31,11 @@ public class MazeFileReader {
         int maxLength = lines.stream().mapToInt(String::length).max().orElse(0);
         Character[][] mazeArray = new Character[lines.size()][maxLength];
 
+        // Convert list of strings into a 2D character array
         for (int i = 0; i < lines.size(); i++) {
             String row = lines.get(i);
             for (int j = 0; j < maxLength; j++) {
-                mazeArray[i][j] = j < row.length() ? row.charAt(j) : ' ';
+                mazeArray[i][j] = j < row.length() ? row.charAt(j) : ' '; // Fill missing spaces
             }
         }
 
