@@ -1,78 +1,76 @@
 package ca.mcmaster.se2aa4.mazerunner;
 
 public class Maze {
-    private Character[][] grid;
-    private int entryRow;
-    private int entryCol = 0; // Assuming entryCol always occurs at column 0.
-    private int exitRow;
-    private int exitCol; // Taking the first row as a reference and assuming all rows are the same size.
+    private final Character[][] grid;
+    private final int entryRow;
+    private final int entryCol = 0; // Entry always at column 0
+    private final int exitRow;
+    private final int exitCol;
 
-    // Constructor
     public Maze(Character[][] grid) {
         if (grid == null || grid.length == 0 || grid[0].length == 0) {
             throw new IllegalArgumentException("Grid cannot be null or empty");
         }
-        this.exitCol = grid[this.entryCol].length - 1;
         this.grid = grid;
+        this.entryRow = findEntryRow();
+        this.exitCol = grid[0].length - 1;
+        this.exitRow = findExitRow();
     }
 
-    // Get entry row assuming the entry row always occurs at the leftmost column, which is column 0 and there is only one entry point.
-    public int getEntryRow() {
+    private int findEntryRow() {
         for (int i = 0; i < grid.length; i++) {
             if (grid[i][entryCol] == ' ') {
-                entryRow = i;
-                return entryRow;
+                return i;
             }
         }
         throw new IllegalStateException("No entry point found at column 0");
     }
 
-    // Getter method to get the entry column
-    public int getEntryCol() {
-        return this.entryCol;
-    }
-
-    // Get exit row assuming the exit row always occurs at the rightmost column
-    public int getExitRow() {
-        // Taking the first row as a reference and assuming all rows are the same size.
-        for (int j = 0; j < grid.length; j++) {
-            if (grid[j][exitCol] == ' ') {
-                exitRow = j;
-                return exitRow;
+    private int findExitRow() {
+        for (int i = 0; i < grid.length; i++) {
+            if (grid[i][exitCol] == ' ') {
+                return i;
             }
         }
         throw new IllegalStateException("No exit point found at the rightmost column.");
     }
 
-    // Getter method to get the exit column
-    public int getExitCol() {
-        return this.exitCol;
-    }
+    public int getEntryRow() { return entryRow; }
+    public int getEntryCol() { return entryCol; }
+    public int getExitRow() { return exitRow; }
+    public int getExitCol() { return exitCol; }
+    public Character[][] getGrid() { return grid; }
 
-    // Getter method to get the 2D grid
-    public Character[][] getGrid() {
-        return this.grid;
-    }
-
-    // Check if a given position is the exit
     public boolean isExit(int row, int col) {
-        return row == getExitRow() && col == getExitCol();
+        return row == exitRow && col == exitCol;
     }
 
     public char returnCellValue(int row, int col) {
         return grid[row][col];
     }
 
+    // Valid change in position while moving forward (Change in position can only occur while moving forward)
+    public boolean isValidMove(Position position, Direction direction) {
+        int row = position.getRow();
+        int col = position.getCol();
 
-    StringBuilder mazeLook = new StringBuilder("\n");
-    // Method to print the maze (for visualization and verification)
+        return switch (direction) {
+            case NORTH -> row > 0 && grid[row - 1][col] == ' ';
+            case SOUTH -> row < grid.length - 1 && grid[row + 1][col] == ' ';
+            case EAST -> col < grid[0].length - 1 && grid[row][col + 1] == ' ';
+            case WEST -> col > 0 && grid[row][col - 1] == ' ';
+            default -> false;
+        };
+    }
+
     public String printMaze() {
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[i].length; j++) {
-                mazeLook.append(grid[i][j] + " ");
+        StringBuilder sb = new StringBuilder();
+        for (Character[] row : grid) {
+            for (Character cell : row) {
+                sb.append(cell).append(" ");
             }
-            mazeLook.append("\n");
+            sb.append("\n");
         }
-        return mazeLook.toString();
+        return sb.toString();
     }
 }
