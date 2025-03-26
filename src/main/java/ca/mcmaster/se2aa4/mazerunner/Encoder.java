@@ -17,7 +17,7 @@ public class Encoder {
      * @return The encoded string in the compressed format.
      * @throws IllegalArgumentException if the input string is empty.
      */
-    public static String encoder(String longText) {
+    public static String encode(String longText) {
         // Validate that the input string is not empty
         if (longText.length() == 0) {
             throw new IllegalArgumentException("There is no path available.");
@@ -45,10 +45,10 @@ public class Encoder {
             }
 
             // Append the count and the character (in uppercase) to the encoded string
-            encodedText.append(countStr + String.valueOf(longText.charAt(i)).toUpperCase() + " ");
+            encodedText.append(countStr).append(String.valueOf(longText.charAt(i)).toUpperCase()).append(" ");
         }
 
         // Return the factorized path
-        return encodedText.toString();
+        return encodedText.toString().trim();
     }
 }
