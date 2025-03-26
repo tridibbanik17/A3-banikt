@@ -2,7 +2,6 @@ package ca.mcmaster.se2aa4.mazerunner;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 
 /**
@@ -10,10 +9,8 @@ import java.util.logging.Logger;
  * It navigates through the maze and keeps track of the path taken and the canonical output path.
  */
 public class MazeSolver {
-    private static final Logger logger = Logger.getLogger(MazeSolver.class.getName());
-    
     // Represents the maze to be solved
-    private Maze maze;
+    private final Maze maze;
     
     // Tracks the current position of the solver in the maze
     private Position currentPosition;
@@ -22,10 +19,10 @@ public class MazeSolver {
     private Direction currentDirection;
 
     // Stores the steps taken during the maze-solving process
-    private List<String> pathTaken;
+    private final List<String> pathTaken;
     
     // Stores the canonical path as a sequence of "F", "L", and "R"
-    private StringBuilder finalOutput;
+    private final StringBuilder finalOutput;
     
     // Tracks the last logged position to prevent dNORTHlicate entries in the path log
     private Position lastPosition;
@@ -164,75 +161,90 @@ public class MazeSolver {
 
         @Override
         public boolean canMoveForward() {
-            // Checks if the solver can move forward based on current direction
-            if (mazeSolver.currentDirection == Direction.NORTH) {
-                if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol())) == ' ')) {
-                    return true;
+            if (null != mazeSolver.currentDirection) // Checks if the solver can move forward based on current direction
+            switch (mazeSolver.currentDirection) {
+                case NORTH -> {
+                    if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol())) == ' ')) {
+                        return true;
+                    }
+                }
+                case SOUTH -> {
+                    if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() - 1) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() + 1, mazeSolver.currentPosition.getCol())) == ' ')){
+                        return true;
+                    }
+                }
+                case EAST -> {
+                    if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() + 1, mazeSolver.currentPosition.getCol()) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1)) == ' ')){
+                        return true;
+                    }
+                }
+                case WEST -> {
+                    if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol()) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() - 1)) == ' ')){
+                        return true;
+                    }
+                }
+                default -> {
                 }
             }
-            else if (mazeSolver.currentDirection == Direction.SOUTH) {
-                if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() - 1) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() + 1, mazeSolver.currentPosition.getCol())) == ' ')){
-                    return true;
-                }
-            }
-            else if (mazeSolver.currentDirection == Direction.EAST) {
-                if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() + 1, mazeSolver.currentPosition.getCol()) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1)) == ' ')){
-                    return true;
-                }
-            }
-            else if (mazeSolver.currentDirection == Direction.WEST) {
-                if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol()) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() - 1)) == ' ')){
-                    return true;
-                }
-            }
-            return false;
+                return false;
         }
 
         @Override
         public boolean canTurnAround() {
-            // Checks if the solver can turn around based on current direction
-            if (mazeSolver.currentDirection == Direction.NORTH) {
-                if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol()) == '#') && (mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() - 1) == '#') && (mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1) == '#')) {
-                    return true;
+            if (null != mazeSolver.currentDirection) // Checks if the solver can turn around based on current direction
+            switch (mazeSolver.currentDirection) {
+                case NORTH -> {
+                    if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol()) == '#') && (mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() - 1) == '#') && (mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1) == '#')) {
+                        return true;
+                    }
                 }
-            } else if (mazeSolver.currentDirection == Direction.SOUTH) {
-                if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() + 1, mazeSolver.currentPosition.getCol()) == '#') && (mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() - 1) == '#') && (mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1) == '#')) {
-                    return true;
+                case SOUTH -> {
+                    if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() + 1, mazeSolver.currentPosition.getCol()) == '#') && (mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() - 1) == '#') && (mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1) == '#')) {
+                        return true;
+                    }
                 }
-            } else if (mazeSolver.currentDirection == Direction.EAST) {
-                if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1) == '#') && (mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol()) == '#') && (mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() + 1, mazeSolver.currentPosition.getCol()) == '#')) {
-                    return true;
+                case EAST -> {
+                    if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1) == '#') && (mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol()) == '#') && (mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() + 1, mazeSolver.currentPosition.getCol()) == '#')) {
+                        return true;
+                    }
                 }
-            } else if (mazeSolver.currentDirection == Direction.WEST) {
-                if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() - 1) == '#') && (mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol()) == '#') && (mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() + 1, mazeSolver.currentPosition.getCol()) == '#')) {
-                    return true;
+                case WEST -> {
+                    if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() - 1) == '#') && (mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol()) == '#') && (mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() + 1, mazeSolver.currentPosition.getCol()) == '#')) {
+                        return true;
+                    }
+                }
+                default -> {
                 }
             }
-            return false;
+                return false;
         }
 
         @Override
         public boolean canTurnRight() {
             // Checks if the solver can turn EAST based on current direction
             if (!canMoveForward()) {
-                if (mazeSolver.currentDirection == Direction.NORTH) {
-                    if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1) == ' ')){
-                        return true;
+                if (null != mazeSolver.currentDirection) switch (mazeSolver.currentDirection) {
+                    case NORTH -> {
+                        if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1) == ' ')){
+                            return true;
+                        }
                     }
-                }
-                else if (mazeSolver.currentDirection == Direction.SOUTH) {
-                    if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() - 1) == ' ')){
-                        return true;
+                    case SOUTH -> {
+                        if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() - 1) == ' ')){
+                            return true;
+                        }
                     }
-                }
-                else if (mazeSolver.currentDirection == Direction.EAST) {
-                    if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() + 1, mazeSolver.currentPosition.getCol()) == ' ')){
-                        return true;
+                    case EAST -> {
+                        if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() + 1, mazeSolver.currentPosition.getCol()) == ' ')){
+                            return true;
+                        }
                     }
-                }
-                else if (mazeSolver.currentDirection == Direction.WEST) {
-                    if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol()) == ' ')){
-                        return true;
+                    case WEST -> {
+                        if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol()) == ' ')){
+                            return true;
+                        }
+                    }
+                    default -> {
                     }
                 }
             }
@@ -241,28 +253,32 @@ public class MazeSolver {
 
         @Override
         public boolean canTurnLeft() {
-            // Checks if the solver can turn WEST based on current direction
-            if (mazeSolver.currentDirection == Direction.NORTH) {
-                if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol())) == '#')){
-                    return true;
+            if (null != mazeSolver.currentDirection) // Checks if the solver can turn WEST based on current direction
+            switch (mazeSolver.currentDirection) {
+                case NORTH -> {
+                    if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol())) == '#')){
+                        return true;
+                    }
+                }
+                case SOUTH -> {
+                    if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() - 1) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() + 1, mazeSolver.currentPosition.getCol())) == '#')){
+                        return true;
+                    }
+                }
+                case EAST -> {
+                    if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() + 1, mazeSolver.currentPosition.getCol()) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1)) == '#')){
+                        return true;
+                    }
+                }
+                case WEST -> {
+                    if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol()) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() - 1)) == '#')){
+                        return true;
+                    }
+                }
+                default -> {
                 }
             }
-            else if (mazeSolver.currentDirection == Direction.SOUTH) {
-                if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() - 1) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() + 1, mazeSolver.currentPosition.getCol())) == '#')){
-                    return true;
-                }
-            }
-            else if (mazeSolver.currentDirection == Direction.EAST) {
-                if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() + 1, mazeSolver.currentPosition.getCol()) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1)) == '#')){
-                    return true;
-                }
-            }
-            else if (mazeSolver.currentDirection == Direction.WEST) {
-                if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol()) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() - 1)) == '#')){
-                    return true;
-                }
-            }
-            return false;
+                return false;
         }
 
         @Override
