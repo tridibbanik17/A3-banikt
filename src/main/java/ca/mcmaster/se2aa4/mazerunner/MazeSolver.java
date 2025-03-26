@@ -33,6 +33,7 @@ public class MazeSolver {
     // Tracks the last logged direction to prevent dNORTHlicate entries in the path log
     private Direction lastDirection;
 
+    private final List<MazeSolverObserver> observers = new ArrayList<>();
     /**
      * Constructor for MazeSolver.
      * Initializes the maze, starting position, direction, and path trackers.
@@ -48,13 +49,6 @@ public class MazeSolver {
         this.lastPosition = null; // Used to track dNORTHlicate entries
         this.lastDirection = null; // Used to track dNORTHlicate entries
     }
-
-    /**
-     * Enum representing possible directions in the maze.
-     */
-    public enum Direction {
-        EAST, WEST, NORTH, SOUTH
-    }
     
     /**
      * Checks if the current position is at the exit of the maze.
@@ -65,30 +59,44 @@ public class MazeSolver {
         return maze.isExit(currentPosition.getRow(), currentPosition.getCol());
     }
 
+    public void addObserver(MazeSolverObserver observer) {
+        observers.add(observer);
+    }
+
+    private void notifyObservers(String message) {
+        for (MazeSolverObserver observer : observers) {
+            observer.update(message);
+        }
+    }
+
     /**
      * Solves the maze using the EAST-hand rule. Continues until the exit is reached or no more valid moves exist.
      * 
      * @return true if the maze is solved, false otherwise.
-     * @throws Exception if an error occurs during the maze-solving process.
      */
-    public boolean solve() throws Exception {
+    public boolean solve() {
         while (!hasReachedEnd()) {
-            MazeNavigationStrategy strategy = getStrategy();
+            MazeNavigation strategy = getStrategy();
             if (strategy.canMoveForward()) {
                 strategy.moveForward(); // Move forward if possible
+                notifyObservers("Moved forward.");
             } else if (strategy.canTurnAround()) {
                 strategy.turnAround(); // Turn around and move forward if needed
                 strategy.moveForward();
-            } else if (strategy.canTurnEAST()) {
-                strategy.turnEAST(); // Turn EAST and move forward if needed
+                notifyObservers("Turned around and moved forward.");
+            } else if (strategy.canTurnRight()) {
+                strategy.turnRight(); // Turn EAST and move forward if needed
                 strategy.moveForward();
-            } else if (strategy.canTurnWEST()) {
-                strategy.turnWEST(); // Turn WEST and move forward if needed
+                notifyObservers("Turned right and moved forward.");
+            } else if (strategy.canTurnLeft()) {
+                strategy.turnLeft(); // Turn WEST and move forward if needed
                 strategy.moveForward();
+                notifyObservers("Turned left and moved forward.");
             } else {
-                break; // Stop if no valid moves are available
+                throw new IllegalStateException("No path found.");
             }
         }
+        notifyObservers("Maze successfully solved!");
         return hasReachedEnd(); // Return whether the maze has been solved
     }
 
@@ -115,7 +123,7 @@ public class MazeSolver {
         StringBuilder cleanedBuild = new StringBuilder("");
         for (int letter = 1; letter < finalOutputString.length(); letter++) {
             if (finalOutputString.charAt(letter - 1) != finalOutputString.charAt(letter)) {
-                cleanedBuild.append(finalOutputString.charAt(letter - 1) + " ");
+                cleanedBuild.append(finalOutputString.charAt(letter - 1)).append(" ");
             } else {
                 cleanedBuild.append(finalOutputString.charAt(letter - 1));
             }
@@ -139,16 +147,15 @@ public class MazeSolver {
 
         lastPosition = new Position(currentPosition.getRow(), currentPosition.getCol());
         lastDirection = currentDirection;
-        logger.info("Position: (" + currentPosition.getRow() + ", " + currentPosition.getCol() + "), Direction: " + action); // Log the current position and direction
         pathTaken.add("Position: (" + currentPosition.getRow() + ", " + currentPosition.getCol() + "), Direction: " + action); // Add to path taken
         finalOutput.append(action); // Add action to canonical path
     }
 
-    private MazeNavigationStrategy getStrategy() {
+    public MazeNavigation getStrategy() {
         return new DefaultMazeNavigationStrategy(this); // Return the default navigation strategy
     }
 
-    private static class DefaultMazeNavigationStrategy implements MazeNavigationStrategy {
+    private static class DefaultMazeNavigationStrategy implements MazeNavigation {
         private final MazeSolver mazeSolver;
 
         public DefaultMazeNavigationStrategy(MazeSolver mazeSolver) {
@@ -205,7 +212,7 @@ public class MazeSolver {
         }
 
         @Override
-        public boolean canTurnEAST() {
+        public boolean canTurnRight() {
             // Checks if the solver can turn EAST based on current direction
             if (!canMoveForward()) {
                 if (mazeSolver.currentDirection == Direction.NORTH) {
@@ -233,7 +240,7 @@ public class MazeSolver {
         }
 
         @Override
-        public boolean canTurnWEST() {
+        public boolean canTurnLeft() {
             // Checks if the solver can turn WEST based on current direction
             if (mazeSolver.currentDirection == Direction.NORTH) {
                 if ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow(), mazeSolver.currentPosition.getCol() + 1) == '#') && ((mazeSolver.maze.returnCellValue(mazeSolver.currentPosition.getRow() - 1, mazeSolver.currentPosition.getCol())) == '#')){
@@ -277,36 +284,33 @@ public class MazeSolver {
         }
 
         @Override
-        public void turnEAST() {
+        public void turnRight() {
             mazeSolver.currentDirection = getTurnedDirection(Direction.EAST); // Turn the solver EAST
             mazeSolver.logStep("R"); // Log the right turn
         }
 
         @Override
-        public void turnWEST() {
+        public void turnLeft() {
             mazeSolver.currentDirection = getTurnedDirection(Direction.WEST); // Turn the solver WEST
             mazeSolver.logStep("L"); // Log the left turn
         }
 
         private Direction getTurnedDirection(Direction turn) {
-            switch (turn) {
-                case EAST:
-                    return switch (mazeSolver.currentDirection) {
-                        case NORTH -> Direction.EAST;
-                        case EAST -> Direction.SOUTH;
-                        case SOUTH -> Direction.WEST;
-                        case WEST -> Direction.NORTH;
-                    };
-                case WEST:
-                    return switch (mazeSolver.currentDirection) {
-                        case NORTH -> Direction.WEST;
-                        case WEST -> Direction.SOUTH;
-                        case SOUTH -> Direction.EAST;
-                        case EAST -> Direction.NORTH;
-                    };
-                default:
-                    return mazeSolver.currentDirection;
-            }
+            return switch (turn) {
+                case EAST -> switch (mazeSolver.currentDirection) {
+                    case NORTH -> Direction.EAST;
+                    case EAST -> Direction.SOUTH;
+                    case SOUTH -> Direction.WEST;
+                    case WEST -> Direction.NORTH;
+                };
+                case WEST -> switch (mazeSolver.currentDirection) {
+                    case NORTH -> Direction.WEST;
+                    case WEST -> Direction.SOUTH;
+                    case SOUTH -> Direction.EAST;
+                    case EAST -> Direction.NORTH;
+                };
+                default -> mazeSolver.currentDirection;
+            };
         }
 
         private Position getNextPosition(Direction direction) {
