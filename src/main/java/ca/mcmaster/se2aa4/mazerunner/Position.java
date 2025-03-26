@@ -10,7 +10,7 @@ public class Position {
         this.col = col;
     }
 
-    // Getter methods
+    // Getters
     public int getRow() {
         return row;
     }
@@ -19,7 +19,7 @@ public class Position {
         return col;
     }
 
-    // Setter methods
+    // Setters
     public void setRow(int row) {
         this.row = row;
     }
@@ -28,7 +28,22 @@ public class Position {
         this.col = col;
     }
 
-    // Return the current position in the form of (x,y) where x is the row number and y is the column number.
+    // Check if two positions are equal
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Position position = (Position) obj;
+        return row == position.row && col == position.col;
+    }
+
+    // Generate a hash code for hashing structures
+    @Override
+    public int hashCode() {
+        return 31 * row + col;
+    }
+
+    // Return position in (x, y) format
     @Override
     public String toString() {
         return "(" + row + ", " + col + ")";
