@@ -8,11 +8,13 @@ public class MazeRunner {
     private final MazeSolver solver;
     private final Maze maze;
 
+    // Initializes the maze and solver
     public MazeRunner(Character[][] mazeArray) {
         this.maze = new Maze(mazeArray);
         this.solver = new MazeSolver(maze);
     }
 
+    // Attempts to solve the maze and returns the encoded solution
     public String solveMaze() throws Exception {
         if (solver.solve()) {
             logger.info("Maze successfully solved!");
