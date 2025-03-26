@@ -21,19 +21,24 @@ public class Main {
         try {
             cmd = parser.parse(options, args);
 
+            // Ensure input file is provided
             if (!cmd.hasOption("i")) {
                 logger.error("Missing required -i flag for the input file.");
                 return;
             }
 
+            // Read the maze from the input file
             String inputFile = cmd.getOptionValue("i");
             Character[][] mazeArray = MazeFileReader.readMaze(inputFile);
             MazeRunner runner = new MazeRunner(mazeArray);
 
+            // Solve the maze
             String factorizedPath = runner.solveMaze();
+
+            // Print out the factorized path
             if (!cmd.hasOption("p")) {
                 System.out.println(factorizedPath);
-            } else {
+            } else { // Validate the correctness of the path
                 String providedPath = cmd.getOptionValue("p");
                 PathValidator.validatePath(factorizedPath, providedPath);
             }
@@ -41,7 +46,5 @@ public class Main {
         } catch (Exception e) {
             logger.error("An error occurred: {}", e.getMessage(), e);
         }
-
-        logger.info("** End of Maze Runner");
     }
 }
