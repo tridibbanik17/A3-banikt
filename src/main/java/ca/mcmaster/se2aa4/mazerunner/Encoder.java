@@ -13,9 +13,6 @@ public class Encoder {
      * Input: "FFF R FF L F"
      * Output: "3F 1R 2F 1L 1F"
      * 
-     * @param longText The input string to be encoded. It should not be empty or null.
-     * @return The encoded string in the compressed format.
-     * @throws IllegalArgumentException if the input string is empty.
      */
     public static String encode(String longText) {
         // Validate that the input string is not empty
