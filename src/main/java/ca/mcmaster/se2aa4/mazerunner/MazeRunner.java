@@ -6,22 +6,15 @@ import org.apache.logging.log4j.Logger;
 public class MazeRunner {
     private static final Logger logger = LogManager.getLogger();
     private final MazeSolver solver;
-    private final Maze maze;
 
-    // Initializes the maze and solver
-    public MazeRunner(Character[][] mazeArray) {
-        this.maze = new Maze(mazeArray);
-        this.solver = new MazeSolver(maze);
+    public MazeRunner(Character[][] mazeArray, String algorithmType) {
+        Maze maze = new Maze(mazeArray);
+        this.solver = MazeNavigationFactory.createSolver(maze, algorithmType);
     }
 
-    // Attempts to solve the maze and returns the encoded solution
     public String solveMaze() throws Exception {
-        if (solver.solve()) {
-            logger.info("Maze successfully solved!");
-            return Encoder.encode(solver.getFinalOutput());
-        } else {
-            logger.error("Maze could not be solved. No valid path found.");
-            throw new Exception("No valid path found.");
-        }
+        solver.solve();
+        logger.info("Maze solved using " + solver.getClass().getSimpleName());
+        return Encoder.encode(solver.getFinalOutput());
     }
 }
