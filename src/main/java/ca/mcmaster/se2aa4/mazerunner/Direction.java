@@ -30,17 +30,14 @@ public enum Direction {
         return symbol;
     }
 
-    // Returns the next direction in clockwise order.
     public Direction turnRight() {
         return values()[(ordinal() + 1) % values().length];
     }
 
-    // Returns the next direction in counterclockwise order.
     public Direction turnLeft() {
         return values()[(ordinal() - 1 + values().length) % values().length];
     }
 
-    // Returns the next direction as the oppoite direction (180 deg difference)
     public Direction turnAround() {
         return values()[(ordinal() + 2) % values().length];
     }
