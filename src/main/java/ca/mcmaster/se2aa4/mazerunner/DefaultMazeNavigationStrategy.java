@@ -16,32 +16,23 @@ public class DefaultMazeNavigationStrategy implements MazeNavigation {
         Maze maze = mazeSolver.getMaze();
         int currentRow = mazeSolver.getCurrentPosition().getRow();
         int currentCol = mazeSolver.getCurrentPosition().getCol();
-        if (currentDirection != null) // Checks if the solver can move forward based on current direction
+        int mazeHeight = maze.getGrid().length;
+        int mazeWidth = maze.getGrid()[0].length;
+
+        if (currentDirection == null) return false;
+
+        boolean canMove = false;
         switch (currentDirection) {
-            case NORTH -> {
-                if ((maze.returnCellValue(currentRow, currentCol + 1) == '#') && ((maze.returnCellValue(currentRow - 1, currentCol)) == ' ')) {
-                    return true;
-                }
-            }
-            case SOUTH -> {
-                if ((maze.returnCellValue(currentRow, currentCol - 1) == '#') && ((maze.returnCellValue(currentRow + 1, currentCol)) == ' ')){
-                    return true;
-                }
-            }
-            case EAST -> {
-                if ((maze.returnCellValue(currentRow + 1, currentCol) == '#') && ((maze.returnCellValue(currentRow, currentCol + 1)) == ' ')){
-                    return true;
-                }
-            }
-            case WEST -> {
-                if ((maze.returnCellValue(currentRow - 1, currentCol) == '#') && ((maze.returnCellValue(currentRow, currentCol - 1)) == ' ')){
-                    return true;
-                }
-            }
-            default -> {
-            }
+            case NORTH -> canMove = currentRow > 0 && maze.returnCellValue(currentRow - 1, currentCol) == ' ' &&
+                    maze.returnCellValue(currentRow, currentCol + 1) == '#';
+            case SOUTH -> canMove = currentRow < mazeHeight - 1 && maze.returnCellValue(currentRow + 1, currentCol) == ' ' &&
+                    maze.returnCellValue(currentRow, currentCol - 1) == '#';
+            case EAST -> canMove = currentCol < mazeWidth - 1 && maze.returnCellValue(currentRow, currentCol + 1) == ' ' &&
+                    maze.returnCellValue(currentRow + 1, currentCol) == '#';
+            case WEST -> canMove = currentCol > 0 && maze.returnCellValue(currentRow, currentCol - 1) == ' ' &&
+                    maze.returnCellValue(currentRow - 1, currentCol) == '#';
         }
-            return false;
+        return canMove;
     }
 
     @Override
@@ -50,32 +41,36 @@ public class DefaultMazeNavigationStrategy implements MazeNavigation {
         Maze maze = mazeSolver.getMaze();
         int currentRow = mazeSolver.getCurrentPosition().getRow();
         int currentCol = mazeSolver.getCurrentPosition().getCol();
-        if (currentDirection != null) // Checks if the solver can turn around based on current direction
+        int mazeHeight = maze.getGrid().length;
+        int mazeWidth = maze.getGrid()[0].length;
+
+        if (currentDirection == null) return false;
+
         switch (currentDirection) {
             case NORTH -> {
-                if ((maze.returnCellValue(currentRow - 1, currentCol) == '#') && (maze.returnCellValue(currentRow, currentCol - 1) == '#') && (maze.returnCellValue(currentRow, currentCol + 1) == '#')) {
-                    return true;
-                }
+                return currentRow > 0 && maze.returnCellValue(currentRow - 1, currentCol) == '#' &&
+                    currentCol > 0 && maze.returnCellValue(currentRow, currentCol - 1) == '#' &&
+                    currentCol < mazeWidth - 1 && maze.returnCellValue(currentRow, currentCol + 1) == '#';
             }
             case SOUTH -> {
-                if ((maze.returnCellValue(currentRow + 1, currentCol) == '#') && (maze.returnCellValue(currentRow, currentCol - 1) == '#') && (maze.returnCellValue(currentRow, currentCol + 1) == '#')) {
-                    return true;
-                }
+                return currentRow < mazeHeight - 1 && maze.returnCellValue(currentRow + 1, currentCol) == '#' &&
+                    currentCol > 0 && maze.returnCellValue(currentRow, currentCol - 1) == '#' &&
+                    currentCol < mazeWidth - 1 && maze.returnCellValue(currentRow, currentCol + 1) == '#';
             }
             case EAST -> {
-                if ((maze.returnCellValue(currentRow, currentCol + 1) == '#') && (maze.returnCellValue(currentRow - 1, currentCol) == '#') && (maze.returnCellValue(currentRow + 1, currentCol) == '#')) {
-                    return true;
-                }
+                return currentCol < mazeWidth - 1 && maze.returnCellValue(currentRow, currentCol + 1) == '#' &&
+                    currentRow > 0 && maze.returnCellValue(currentRow - 1, currentCol) == '#' &&
+                    currentRow < mazeHeight - 1 && maze.returnCellValue(currentRow + 1, currentCol) == '#';
             }
             case WEST -> {
-                if ((maze.returnCellValue(currentRow, currentCol - 1) == '#') && (maze.returnCellValue(currentRow - 1, currentCol) == '#') && (maze.returnCellValue(currentRow + 1, currentCol) == '#')) {
-                    return true;
-                }
+                return currentCol > 0 && maze.returnCellValue(currentRow, currentCol - 1) == '#' &&
+                    currentRow > 0 && maze.returnCellValue(currentRow - 1, currentCol) == '#' &&
+                    currentRow < mazeHeight - 1 && maze.returnCellValue(currentRow + 1, currentCol) == '#';
             }
             default -> {
+                return false;
             }
         }
-            return false;
     }
 
     @Override
@@ -84,32 +79,18 @@ public class DefaultMazeNavigationStrategy implements MazeNavigation {
         Maze maze = mazeSolver.getMaze();
         int currentRow = mazeSolver.getCurrentPosition().getRow();
         int currentCol = mazeSolver.getCurrentPosition().getCol();
-        // Checks if the solver can turn EAST based on current direction
-        if (!canMoveForward()) {
-            if (currentDirection != null) switch (currentDirection) {
-                case NORTH -> {
-                    if ((maze.returnCellValue(currentRow, currentCol + 1) == ' ')){
-                        return true;
-                    }
-                }
-                case SOUTH -> {
-                    if ((maze.returnCellValue(currentRow, currentCol - 1) == ' ')){
-                        return true;
-                    }
-                }
-                case EAST -> {
-                    if ((maze.returnCellValue(currentRow + 1, currentCol) == ' ')){
-                        return true;
-                    }
-                }
-                case WEST -> {
-                    if ((maze.returnCellValue(currentRow - 1, currentCol) == ' ')){
-                        return true;
-                    }
-                }
-                default -> {
-                }
-            }
+
+        // Only check the next right turn if it's within bounds
+        if (canMoveForward()) return false;
+
+        if (currentDirection != null) {
+            return switch (currentDirection) {
+                case NORTH -> currentCol < maze.getGrid()[0].length - 1 && maze.returnCellValue(currentRow, currentCol + 1) == ' ';
+                case SOUTH -> currentCol > 0 && maze.returnCellValue(currentRow, currentCol - 1) == ' ';
+                case EAST -> currentRow < maze.getGrid().length - 1 && maze.returnCellValue(currentRow + 1, currentCol) == ' ';
+                case WEST -> currentRow > 0 && maze.returnCellValue(currentRow - 1, currentCol) == ' ';
+                default -> false;
+            };
         }
         return false;
     }
@@ -120,32 +101,21 @@ public class DefaultMazeNavigationStrategy implements MazeNavigation {
         Maze maze = mazeSolver.getMaze();
         int currentRow = mazeSolver.getCurrentPosition().getRow();
         int currentCol = mazeSolver.getCurrentPosition().getCol();
-        if (currentDirection != null) // Checks if the solver can turn WEST based on current direction
-        switch (currentDirection) {
-            case NORTH -> {
-                if ((maze.returnCellValue(currentRow, currentCol + 1) == '#') && ((maze.returnCellValue(currentRow - 1, currentCol)) == '#')){
-                    return true;
-                }
-            }
-            case SOUTH -> {
-                if ((maze.returnCellValue(currentRow, currentCol - 1) == '#') && ((maze.returnCellValue(currentRow + 1, currentCol)) == '#')){
-                    return true;
-                }
-            }
-            case EAST -> {
-                if ((maze.returnCellValue(currentRow + 1, currentCol) == '#') && ((maze.returnCellValue(currentRow, currentCol + 1)) == '#')){
-                    return true;
-                }
-            }
-            case WEST -> {
-                if ((maze.returnCellValue(currentRow - 1, currentCol) == '#') && ((maze.returnCellValue(currentRow, currentCol - 1)) == '#')){
-                    return true;
-                }
-            }
-            default -> {
-            }
+
+        if (currentDirection != null) {
+            return switch (currentDirection) {
+                case NORTH -> currentCol > 0 && maze.returnCellValue(currentRow, currentCol - 1) == '#' &&
+                    currentRow > 0 && maze.returnCellValue(currentRow - 1, currentCol) == '#';
+                case SOUTH -> currentCol > 0 && maze.returnCellValue(currentRow, currentCol - 1) == '#' &&
+                    currentRow < maze.getGrid().length - 1 && maze.returnCellValue(currentRow + 1, currentCol) == '#';
+                case EAST -> currentRow < maze.getGrid().length - 1 && maze.returnCellValue(currentRow + 1, currentCol) == '#' &&
+                    currentCol < maze.getGrid()[0].length - 1 && maze.returnCellValue(currentRow, currentCol + 1) == '#';
+                case WEST -> currentRow > 0 && maze.returnCellValue(currentRow - 1, currentCol) == '#' &&
+                    currentCol > 0 && maze.returnCellValue(currentRow, currentCol - 1) == '#';
+                default -> false;
+            };
         }
-            return false;
+        return false;
     }
 
     @Override
@@ -167,8 +137,7 @@ public class DefaultMazeNavigationStrategy implements MazeNavigation {
             case WEST -> Direction.EAST;
         }; // Turn the solver 180 degrees
         mazeSolver.setCurrentDirection(newDirection);
-        mazeSolver.logStep("R"); // Log the right turn
-        mazeSolver.logStep("R"); // Log another right turn for 180-degree turn
+        mazeSolver.logStep("RR"); // Log the right turn
     }
 
     @Override
@@ -200,11 +169,15 @@ public class DefaultMazeNavigationStrategy implements MazeNavigation {
     private Position getNextPosition(Direction direction) {
         int row = mazeSolver.getCurrentPosition().getRow();
         int col = mazeSolver.getCurrentPosition().getCol();
+        int maxRow = mazeSolver.getMaze().getGrid().length;
+        int maxCol = mazeSolver.getMaze().getGrid()[0].length;
+
         return switch (direction) {
-            case NORTH -> new Position(row - 1, col);
-            case SOUTH -> new Position(row + 1, col);
-            case WEST -> new Position(row, col - 1);
-            case EAST -> new Position(row, col + 1);
-        }; // Return the next position based on current direction
+            case NORTH -> (row > 0) ? new Position(row - 1, col) : null;
+            case SOUTH -> (row < maxRow - 1) ? new Position(row + 1, col) : null;
+            case WEST -> (col > 0) ? new Position(row, col - 1) : null;
+            case EAST -> (col < maxCol - 1) ? new Position(row, col + 1) : null;
+            default -> null;
+        };
     }
 }
