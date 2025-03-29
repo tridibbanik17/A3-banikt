@@ -4,13 +4,11 @@ public class Position {
     private int row;
     private int col;
 
-    // Constructor
     public Position(int row, int col) {
         this.row = row;
         this.col = col;
     }
 
-    // Getters
     public int getRow() {
         return row;
     }
@@ -19,7 +17,6 @@ public class Position {
         return col;
     }
 
-    // Setters
     public void setRow(int row) {
         this.row = row;
     }
