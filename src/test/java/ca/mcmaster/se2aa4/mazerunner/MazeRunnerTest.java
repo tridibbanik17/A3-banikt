@@ -1,10 +1,16 @@
 package ca.mcmaster.se2aa4.mazerunner;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-import java.util.logging.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 class MazeRunnerTest {
 
@@ -61,9 +67,8 @@ class MazeRunnerTest {
             {'#', '#', '#', '#'}
         };
         Maze maze = new Maze(grid);
-        MazeSolver solver = new MazeSolver(maze);
-        // Solve the maze and check the output path
-        assertTrue(solver.solve());
+        MazeSolver solver = MazeNavigationFactory.createSolver(maze, "righthand");
+        solver.solve();
         assertEquals("FFF", solver.getFinalOutput().trim()); // 3 steps forward from entry column to exit column
     }
 
@@ -77,9 +82,9 @@ class MazeRunnerTest {
             {'#', '#', '#', '#'},
         };
         Maze maze = new Maze(grid);
-        MazeSolver solver = new MazeSolver(maze);
+        MazeSolver solver = MazeNavigationFactory.createSolver(maze, "righthand");
+        solver.solve();
         // Solve the maze and check the output path with turns
-        assertTrue(solver.solve());
         assertEquals("F L F R FF", solver.getFinalOutput());
     }
 
@@ -126,13 +131,14 @@ class MazeRunnerTest {
 
             // Setup and solve maze
             ConsoleObserver consoleObserver = new ConsoleObserver();
-            MazeSolver solver = new MazeSolver(new Maze(new Character[][]{
+            Maze maze = new Maze(new Character[][]{
                 {'#', '#', '#', '#'},
                 {'#', ' ', '#', '#'},
                 {' ', ' ', ' ', ' '},
                 {'#', '#', '#', '#'},
-            }));
+            });
 
+            RightHandNavigation solver = RightHandNavigation.create(maze);
             solver.addObserver(consoleObserver);
             solver.solve();
 
