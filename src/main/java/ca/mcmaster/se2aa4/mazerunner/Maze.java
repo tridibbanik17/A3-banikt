@@ -6,6 +6,7 @@ public class Maze {
     private final int entryCol = 0; // Entry always at column 0
     private final int exitRow;
     private final int exitCol;
+    private boolean solved;
 
     public Maze(Character[][] grid) {
         if (grid == null || grid.length == 0 || grid[0].length == 0) {
@@ -15,6 +16,17 @@ public class Maze {
         this.entryRow = findEntryRow();
         this.exitCol = grid[0].length - 1;
         this.exitRow = findExitRow();
+        this.solved = false; 
+    }
+
+    // Set the maze as solved
+    public void setSolved(boolean solved) {
+        this.solved = solved;
+    }
+
+    // Check if the maze is solved
+    public boolean isSolved() {
+        return solved;
     }
 
     private int findEntryRow() {
