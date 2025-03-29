@@ -30,7 +30,9 @@ public class Main {
             // Read the maze from the input file
             String inputFile = cmd.getOptionValue("i");
             Character[][] mazeArray = MazeFileReader.readMaze(inputFile);
-            MazeRunner runner = new MazeRunner(mazeArray);
+            // Default to "righthand" algorithm 
+            String algorithmType = "righthand";
+            MazeRunner runner = new MazeRunner(mazeArray, algorithmType);
 
             // Solve the maze
             String factorizedPath = runner.solveMaze();
@@ -38,9 +40,9 @@ public class Main {
             // Print out the factorized path
             if (!cmd.hasOption("p")) {
                 System.out.println(factorizedPath);
-            } else { // Validate the correctness of the path
+            } else { 
                 String providedPath = cmd.getOptionValue("p");
-                PathValidator.validatePath(factorizedPath, providedPath);
+                PathValidator.validatePath(factorizedPath, providedPath); // Validate the correctness of the path
             }
 
         } catch (Exception e) {
